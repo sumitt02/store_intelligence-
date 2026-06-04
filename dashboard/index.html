@@ -390,9 +390,7 @@
 </div>
 
 <script>
-const API = window.location.origin === 'null' || window.location.origin === 'file://'
-  ? 'https://store-intelligence-production.up.railway.app'
-  : window.location.origin.replace(/:3000\b/, ':8001').replace(/:8080\b/, ':8001');
+const API = 'https://storeintelligence-production-739d.up.railway.app';
 
 let currentStore = document.getElementById('store-select').value;
 let autoRefresh = true;
