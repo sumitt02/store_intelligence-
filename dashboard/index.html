@@ -391,7 +391,7 @@
 
 <script>
 const API = window.location.origin === 'null' || window.location.origin === 'file://'
-  ? 'http://localhost:8001'
+  ? 'https://store-intelligence-production.up.railway.app'
   : window.location.origin.replace(/:3000\b/, ':8001').replace(/:8080\b/, ':8001');
 
 let currentStore = document.getElementById('store-select').value;
