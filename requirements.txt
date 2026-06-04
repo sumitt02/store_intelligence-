@@ -11,3 +11,4 @@ httpx==0.27.2
 # Detection pipeline (install separately if running detect.py against real footage)
 # ultralytics==8.3.0
 # opencv-python-headless==4.10.0.84
+aiofiles==23.2.1

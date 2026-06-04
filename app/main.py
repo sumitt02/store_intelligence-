@@ -23,6 +23,8 @@ from typing import Any
 
 from fastapi import FastAPI, Depends, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
@@ -238,6 +240,16 @@ async def get_insights(
         return db_error_response(e)
 
 
+@app.get("/dashboard", include_in_schema=False)
+async def dashboard():
+    """Serve the live dashboard."""
+    from pathlib import Path
+    dashboard_path = Path(__file__).parent.parent / "dashboard" / "index.html"
+    if dashboard_path.exists():
+        return FileResponse(str(dashboard_path), media_type="text/html")
+    return {"error": "Dashboard not found"}
+
+
 @app.get("/", include_in_schema=False)
 async def root():
-    return {"service": "Store Intelligence API", "version": "1.0.0", "docs": "/docs"}
+    return {"service": "Store Intelligence API", "version": "1.0.0", "docs": "/docs", "dashboard": "/dashboard"}
