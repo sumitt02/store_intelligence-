@@ -1,0 +1,181 @@
+{
+  "stores": {
+    "STORE_BLR_BRIGADE": {
+      "name": "Purplle Brigade Road Bangalore",
+      "store_code": "ST1008",
+      "city": "Bangalore",
+      "open_hours": {"open": "10:00", "close": "22:00"},
+      "cameras": {
+        "CAM_01": {
+          "type": "floor",
+          "label": "Top Shelf - Skincare",
+          "coverage": ["EB_KOREAN", "THE_FACE_SHOP", "GOOD_VIBES", "DERMDOC", "MINIMALIST", "AQUALOGICA", "LAKME_SKIN"],
+          "description": "Top back-wall shelves, skincare brands",
+          "notes": "CAM 1 - 1920x1080 @ 30fps"
+        },
+        "CAM_02": {
+          "type": "floor",
+          "label": "Bottom Shelf - Makeup",
+          "coverage": ["MAYBELLINE", "FACES_CANADA", "LAKME_MAKEUP", "COLORBAR_SUGAR", "SWISS_BEAUTY", "RENEE_NY_BAE", "ALPS_GOODNESS", "STREAX"],
+          "description": "Bottom back-wall shelves, makeup brands",
+          "notes": "CAM 2 - 1920x1080 @ 30fps"
+        },
+        "CAM_03": {
+          "type": "entry",
+          "label": "Entry / Exit",
+          "coverage": ["ENTRY_EXIT"],
+          "description": "Store entrance glass doors - primary entry/exit tracking camera",
+          "notes": "CAM 3 - 1920x1080 @ 30fps. Purplle storefront, footmat visible"
+        },
+        "CAM_04": {
+          "type": "stockroom",
+          "label": "Stockroom / Back Office",
+          "coverage": ["STOCKROOM"],
+          "description": "Back room with inventory boxes - staff only area",
+          "notes": "CAM 4 - 1920x1080 @ 25fps. All detections marked is_staff=true"
+        },
+        "CAM_05": {
+          "type": "billing",
+          "label": "Cash Counter + Accessories",
+          "coverage": ["CASH_COUNTER", "ACCESSORIES"],
+          "description": "Billing laptop counter (left) and Accessories display (right)",
+          "notes": "CAM 5 - 1920x1080 @ 25fps"
+        }
+      },
+      "zones": {
+        "ENTRY_EXIT": {
+          "label": "Entry / Exit",
+          "type": "threshold",
+          "sku_zone": null,
+          "camera": "CAM_03"
+        },
+        "EB_KOREAN": {
+          "label": "EB Korean",
+          "type": "product",
+          "sku_zone": "EB_KOREAN",
+          "camera": "CAM_01",
+          "shelf": "top",
+          "position": "left"
+        },
+        "THE_FACE_SHOP": {
+          "label": "The Face Shop",
+          "type": "product",
+          "sku_zone": "THE_FACE_SHOP",
+          "camera": "CAM_01",
+          "shelf": "top"
+        },
+        "GOOD_VIBES": {
+          "label": "Good Vibes",
+          "type": "product",
+          "sku_zone": "GOOD_VIBES",
+          "camera": "CAM_01",
+          "shelf": "top"
+        },
+        "DERMDOC": {
+          "label": "DermDoc",
+          "type": "product",
+          "sku_zone": "DERMDOC",
+          "camera": "CAM_01",
+          "shelf": "top"
+        },
+        "MINIMALIST": {
+          "label": "Minimalist",
+          "type": "product",
+          "sku_zone": "MINIMALIST",
+          "camera": "CAM_01",
+          "shelf": "top"
+        },
+        "AQUALOGICA": {
+          "label": "Aqualogica",
+          "type": "product",
+          "sku_zone": "AQUALOGICA",
+          "camera": "CAM_01",
+          "shelf": "top"
+        },
+        "LAKME_SKIN": {
+          "label": "Lakme Skin",
+          "type": "product",
+          "sku_zone": "LAKME_SKIN",
+          "camera": "CAM_01",
+          "shelf": "top"
+        },
+        "MAYBELLINE": {
+          "label": "Maybelline",
+          "type": "product",
+          "sku_zone": "MAYBELLINE",
+          "camera": "CAM_02",
+          "shelf": "bottom",
+          "position": "left"
+        },
+        "FACES_CANADA": {
+          "label": "Faces Canada",
+          "type": "product",
+          "sku_zone": "FACES_CANADA",
+          "camera": "CAM_02",
+          "shelf": "bottom"
+        },
+        "LAKME_MAKEUP": {
+          "label": "Lakme Makeup",
+          "type": "product",
+          "sku_zone": "LAKME_MAKEUP",
+          "camera": "CAM_02",
+          "shelf": "bottom"
+        },
+        "COLORBAR_SUGAR": {
+          "label": "Colorbar + Sugar",
+          "type": "product",
+          "sku_zone": "COLORBAR_SUGAR",
+          "camera": "CAM_02",
+          "shelf": "bottom"
+        },
+        "SWISS_BEAUTY": {
+          "label": "Swiss Beauty",
+          "type": "product",
+          "sku_zone": "SWISS_BEAUTY",
+          "camera": "CAM_02",
+          "shelf": "bottom"
+        },
+        "RENEE_NY_BAE": {
+          "label": "Renee / NY Bae",
+          "type": "product",
+          "sku_zone": "RENEE_NY_BAE",
+          "camera": "CAM_02",
+          "shelf": "bottom"
+        },
+        "ALPS_GOODNESS": {
+          "label": "Alps Goodness",
+          "type": "product",
+          "sku_zone": "ALPS_GOODNESS",
+          "camera": "CAM_02",
+          "shelf": "bottom"
+        },
+        "STREAX": {
+          "label": "Streax",
+          "type": "product",
+          "sku_zone": "STREAX",
+          "camera": "CAM_02",
+          "shelf": "bottom"
+        },
+        "CASH_COUNTER": {
+          "label": "Cash Counter",
+          "type": "billing",
+          "sku_zone": null,
+          "camera": "CAM_05"
+        },
+        "ACCESSORIES": {
+          "label": "Accessories",
+          "type": "product",
+          "sku_zone": "ACCESSORIES",
+          "camera": "CAM_05"
+        },
+        "STOCKROOM": {
+          "label": "Stockroom",
+          "type": "staff_only",
+          "sku_zone": null,
+          "camera": "CAM_04",
+          "note": "All detections from this camera are marked is_staff=true"
+        }
+      }
+    }
+  }
+}

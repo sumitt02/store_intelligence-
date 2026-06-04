@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Purplle Store Intelligence — Brigade Road</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    :root {
+      --bg: #0a0c12;
+      --surface: #111420;
+      --card: #161a28;
+      --card2: #1c2135;
+      --border: #252a40;
+      --accent: #7c3aed;
+      --accent-light: #a78bfa;
+      --cyan: #06b6d4;
+      --pink: #ec4899;
+      --ok: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --muted2: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+    a { color: var(--accent-light); }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(90deg, #0a0c12 0%, #12102a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 0.9rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 0.75rem; }
+    .logo-mark {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--pink));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1rem; color: white;
+    }
+    header h1 { font-size: 1.05rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+    header h1 span { color: var(--accent-light); }
+    .live-badge { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--ok); font-weight: 600; }
+    .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); animation: pulse 1.8s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+
+    /* ── Controls ── */
+    .controls {
+      padding: 0.75rem 2rem;
+      display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+    }
+    select, button, input[type=date] {
+      background: var(--card); color: var(--text);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.45rem 0.9rem; cursor: pointer; font-size: 0.85rem; font-family: inherit;
+    }
+    select:focus, button:focus, input:focus { outline: 2px solid var(--accent); }
+    button.primary { background: linear-gradient(135deg, var(--accent), #9333ea); color: white; border: none; font-weight: 600; }
+    button.primary:hover { opacity: 0.88; }
+    .ctrl-label { font-size: 0.8rem; color: var(--muted2); font-weight: 500; }
+
+    /* ── Grid / Cards ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem; padding: 1.25rem 2rem 0;
+    }
+    .kpi-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.25rem 1.5rem;
+      position: relative; overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .kpi-card:hover { border-color: var(--accent); }
+    .kpi-card .accent-bar {
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--pink));
+    }
+    .kpi-label { font-size: 0.7rem; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
+    .kpi-value { font-size: 2.2rem; font-weight: 800; margin: 0.3rem 0; letter-spacing: -0.03em; }
+    .kpi-value.danger { color: var(--danger); }
+    .kpi-value.ok { color: var(--ok); }
+    .kpi-value.warn { color: var(--warn); }
+    .kpi-sub { font-size: 0.75rem; color: var(--muted); }
+
+    /* ── Two-column layout ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem 2rem 0; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; padding: 1rem 2rem 0; }
+    @media (max-width: 900px) { .two-col, .three-col { grid-template-columns: 1fr; } }
+
+    /* ── Section card ── */
+    .panel {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.25rem;
+    }
+    .panel-title {
+      font-size: 0.7rem; color: var(--muted2); text-transform: uppercase;
+      letter-spacing: 0.1em; font-weight: 700; margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .panel-title .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+    /* ── Funnel ── */
+    .funnel { display: flex; flex-direction: column; gap: 0.5rem; }
+    .funnel-stage {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.65rem 1rem;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .f-label { font-size: 0.78rem; font-weight: 600; min-width: 115px; }
+    .funnel-bar-wrap { flex: 1; background: var(--border); border-radius: 4px; height: 6px; }
+    .funnel-bar { background: linear-gradient(90deg, var(--accent), var(--pink)); height: 6px; border-radius: 4px; transition: width 0.6s cubic-bezier(.4,0,.2,1); }
+    .f-count { font-weight: 700; font-size: 0.9rem; min-width: 2.5rem; text-align: right; }
+    .f-drop { font-size: 0.72rem; color: var(--danger); min-width: 4.5rem; text-align: right; }
+
+    /* ── Heatmap ── */
+    .heatmap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.6rem; }
+    .heat-cell {
+      border-radius: 10px; padding: 0.85rem;
+      display: flex; flex-direction: column; gap: 0.2rem;
+      cursor: default; transition: transform 0.15s, box-shadow 0.15s;
+      position: relative; overflow: hidden;
+    }
+    .heat-cell:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+    .heat-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.9); }
+    .heat-score { font-size: 1.6rem; font-weight: 800; color: white; line-height: 1; }
+    .heat-meta { font-size: 0.64rem; color: rgba(255,255,255,0.65); }
+
+    /* ── Revenue chart ── */
+    .revenue-bars { display: flex; align-items: flex-end; gap: 4px; height: 80px; margin-top: 0.5rem; }
+    .rev-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .rev-bar { width: 100%; border-radius: 3px 3px 0 0; background: linear-gradient(180deg, var(--accent), var(--pink)); min-height: 2px; transition: height 0.5s ease; }
+    .rev-label { font-size: 0.55rem; color: var(--muted); white-space: nowrap; }
+
+    /* ── Brand Affinity ── */
+    .affinity-list { display: flex; flex-direction: column; gap: 0.4rem; }
+    .affinity-row {
+      display: flex; align-items: center; gap: 0.75rem;
+      background: var(--surface); border-radius: 6px; padding: 0.5rem 0.75rem;
+    }
+    .aff-zones { font-size: 0.78rem; font-weight: 600; flex: 1; }
+    .aff-arrow { color: var(--muted); font-size: 0.8rem; }
+    .aff-bar-wrap { width: 80px; background: var(--border); border-radius: 3px; height: 5px; }
+    .aff-bar { background: var(--cyan); height: 5px; border-radius: 3px; transition: width 0.5s; }
+    .aff-count { font-size: 0.75rem; font-weight: 700; min-width: 24px; text-align: right; color: var(--cyan); }
+
+    /* ── Journey transitions ── */
+    .journey-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+    .transition-row {
+      display: flex; align-items: center; gap: 0.4rem;
+      background: var(--surface); border-radius: 6px; padding: 0.45rem 0.6rem; font-size: 0.72rem;
+    }
+    .tr-from { color: var(--muted2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tr-arrow { color: var(--accent-light); font-size: 0.8rem; }
+    .tr-to { color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tr-cnt { color: var(--warn); font-weight: 700; min-width: 24px; text-align: right; }
+
+    /* ── Insights ── */
+    .insights-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .insight-card {
+      border-left: 3px solid; border-radius: 0 10px 10px 0;
+      padding: 0.8rem 1rem; background: var(--surface);
+      transition: background 0.15s;
+    }
+    .insight-card:hover { background: var(--card2); }
+    .insight-card.CRITICAL { border-color: var(--danger); }
+    .insight-card.HIGH { border-color: var(--warn); }
+    .insight-card.MEDIUM { border-color: var(--accent-light); }
+    .insight-card.LOW { border-color: var(--muted); }
+    .insight-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; }
+    .insight-priority {
+      font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 0.15rem 0.5rem; border-radius: 4px;
+    }
+    .insight-priority.CRITICAL { background: rgba(239,68,68,0.2); color: var(--danger); }
+    .insight-priority.HIGH { background: rgba(245,158,11,0.2); color: var(--warn); }
+    .insight-priority.MEDIUM { background: rgba(167,139,250,0.2); color: var(--accent-light); }
+    .insight-priority.LOW { background: rgba(100,116,139,0.2); color: var(--muted2); }
+    .insight-category { font-size: 0.62rem; color: var(--muted); text-transform: uppercase; }
+    .insight-title { font-size: 0.88rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .insight-detail { font-size: 0.78rem; color: var(--muted2); line-height: 1.5; }
+    .insight-impact { font-size: 0.75rem; color: var(--ok); margin-top: 0.3rem; font-style: italic; }
+
+    /* ── Revenue KPI row ── */
+    .rev-kpi-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .rev-kpi { text-align: center; }
+    .rev-kpi-val { font-size: 1.4rem; font-weight: 800; }
+    .rev-kpi-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; }
+
+    /* ── Anomalies ── */
+    .anomaly-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .anomaly-item {
+      background: var(--surface); border-left: 3px solid; border-radius: 0 8px 8px 0;
+      padding: 0.7rem 1rem;
+    }
+    .anomaly-item.CRITICAL { border-color: var(--danger); }
+    .anomaly-item.WARN, .anomaly-item.WARNING { border-color: var(--warn); }
+    .anomaly-item.INFO { border-color: var(--cyan); }
+    .anomaly-type { font-size: 0.7rem; font-weight: 700; color: var(--muted); margin-bottom: 0.2rem; }
+    .anomaly-desc { font-size: 0.82rem; }
+    .anomaly-action { font-size: 0.72rem; color: var(--cyan); margin-top: 0.2rem; }
+    .no-anomaly { color: var(--ok); font-size: 0.85rem; padding: 0.5rem 0; display: flex; align-items: center; gap: 0.4rem; }
+
+    /* ── Event log ── */
+    #event-log {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; height: 180px; overflow-y: auto;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.72rem; padding: 0.75rem;
+    }
+    .log-line { padding: 0.12rem 0; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--muted2); }
+    .log-line.ENTRY { color: var(--ok); }
+    .log-line.EXIT { color: var(--muted); }
+    .log-line.ZONE_DWELL { color: var(--cyan); }
+    .log-line.BILLING_QUEUE_JOIN { color: var(--warn); }
+    .log-line.BILLING_QUEUE_ABANDON { color: var(--danger); }
+    .log-line.REENTRY { color: #a78bfa; }
+    .log-line.ZONE_ENTER { color: #67e8f9; }
+
+    /* ── Status bar ── */
+    #status-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--surface); border-top: 1px solid var(--border);
+      padding: 0.4rem 2rem; font-size: 0.72rem; color: var(--muted);
+      display: flex; justify-content: space-between; align-items: center; z-index: 100;
+    }
+    #api-status.ok { color: var(--ok); font-weight: 600; }
+    #api-status.error { color: var(--danger); font-weight: 600; }
+
+    /* ── Tabs ── */
+    .tab-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .tab-btn {
+      font-size: 0.78rem; padding: 0.35rem 0.9rem; border-radius: 6px;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--muted2); cursor: pointer; font-family: inherit; font-weight: 500;
+      transition: all 0.15s;
+    }
+    .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .tab-btn:hover:not(.active) { border-color: var(--accent-light); color: var(--accent-light); }
+
+    /* ── Summary badges ── */
+    .badge-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .badge {
+      font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 20px;
+    }
+    .badge.c { background: rgba(239,68,68,0.15); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
+    .badge.h { background: rgba(245,158,11,0.15); color: var(--warn); border: 1px solid rgba(245,158,11,0.3); }
+    .badge.m { background: rgba(167,139,250,0.15); color: var(--accent-light); border: 1px solid rgba(167,139,250,0.3); }
+    .badge.l { background: rgba(100,116,139,0.15); color: var(--muted2); border: 1px solid rgba(100,116,139,0.3); }
+
+    .section-pad { padding: 1rem 2rem 0; }
+
+    .refresh-spinner { display: none; }
+    .refreshing .refresh-spinner { display: inline; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--surface); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">P</div>
+    <h1>Purplle <span>Store Intelligence</span></h1>
+  </div>
+  <div class="live-badge">
+    <div class="pulse"></div>
+    <span id="live-label">Live</span>
+    <span style="color:var(--muted);margin-left:0.4rem" id="last-updated"></span>
+  </div>
+</header>
+
+<div class="controls">
+  <span class="ctrl-label">Store</span>
+  <select id="store-select">
+    <option value="STORE_BLR_BRIGADE" selected>Brigade Road Bangalore ★ Real CCTV</option>
+    <option value="STORE_BLR_001">STORE_BLR_001 — MG Road Bangalore</option>
+    <option value="STORE_BLR_002">STORE_BLR_002 — Indiranagar Bangalore</option>
+    <option value="STORE_MUM_001">STORE_MUM_001 — Bandra Mumbai</option>
+    <option value="STORE_MUM_002">STORE_MUM_002 — Andheri Mumbai</option>
+    <option value="STORE_DEL_001">STORE_DEL_001 — Connaught Place Delhi</option>
+  </select>
+  <span class="ctrl-label">Date</span>
+  <input type="date" id="date-picker" value="2026-04-10" />
+  <button class="primary" onclick="refresh()">↻ <span class="refresh-spinner">⟳</span> Refresh</button>
+  <button onclick="toggleAutoRefresh()" id="auto-btn">⏸ Pause</button>
+</div>
+
+<!-- KPI Cards -->
+<div class="kpi-grid" id="kpi-grid">
+  <div class="kpi-card"><div class="accent-bar"></div>
+    <div class="kpi-label">Unique Visitors</div>
+    <div class="kpi-value" id="kpi-visitors">—</div>
+    <div class="kpi-sub">Customers only · staff excluded</div>
+  </div>
+  <div class="kpi-card"><div class="accent-bar"></div>
+    <div class="kpi-label">Total Revenue</div>
+    <div class="kpi-value" id="kpi-revenue">—</div>
+    <div class="kpi-sub" id="kpi-txn-sub">—</div>
+  </div>
+  <div class="kpi-card"><div class="accent-bar"></div>
+    <div class="kpi-label">Revenue per Visitor</div>
+    <div class="kpi-value" id="kpi-rpv">—</div>
+    <div class="kpi-sub" id="kpi-basket-sub">—</div>
+  </div>
+  <div class="kpi-card"><div class="accent-bar"></div>
+    <div class="kpi-label">Conversion Rate</div>
+    <div class="kpi-value" id="kpi-conversion">—</div>
+    <div class="kpi-sub">Billing zone → purchase</div>
+  </div>
+  <div class="kpi-card"><div class="accent-bar"></div>
+    <div class="kpi-label">Avg Journey Length</div>
+    <div class="kpi-value" id="kpi-journey">—</div>
+    <div class="kpi-sub">Zones per customer session</div>
+  </div>
+  <div class="kpi-card"><div class="accent-bar"></div>
+    <div class="kpi-label">Queue Abandonment</div>
+    <div class="kpi-value danger" id="kpi-abandon">—</div>
+    <div class="kpi-sub">Billing queue abandon rate</div>
+  </div>
+</div>
+
+<!-- Funnel + Revenue Chart -->
+<div class="two-col">
+  <div class="panel">
+    <div class="panel-title"><div class="dot"></div>Conversion Funnel</div>
+    <div class="funnel" id="funnel-container"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title"><div class="dot" style="background:var(--pink)"></div>Hourly Revenue (₹)</div>
+    <div class="rev-kpi-row" id="rev-kpi-row"></div>
+    <div class="revenue-bars" id="revenue-chart"></div>
+  </div>
+</div>
+
+<!-- Heatmap -->
+<div class="section-pad">
+  <div class="panel">
+    <div class="panel-title"><div class="dot" style="background:var(--warn)"></div>Zone Heatmap — Footfall × Dwell Score (0–100)</div>
+    <div class="heatmap-grid" id="heatmap-container"></div>
+  </div>
+</div>
+
+<!-- Journey + Affinity -->
+<div class="two-col">
+  <div class="panel">
+    <div class="panel-title"><div class="dot" style="background:var(--cyan)"></div>Top Zone Transitions</div>
+    <div class="journey-grid" id="transitions-container"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title"><div class="dot" style="background:var(--pink)"></div>Brand Affinity (Co-Visited)</div>
+    <div class="affinity-list" id="affinity-container"></div>
+  </div>
+</div>
+
+<!-- Insights -->
+<div class="section-pad">
+  <div class="panel">
+    <div class="panel-title"><div class="dot" style="background:var(--ok)"></div>AI-Generated Insights & Recommendations</div>
+    <div class="badge-row" id="insight-badges"></div>
+    <div class="insights-list" id="insights-container"></div>
+  </div>
+</div>
+
+<!-- Anomalies + Event Feed -->
+<div class="two-col" style="padding-bottom:1rem">
+  <div class="panel">
+    <div class="panel-title"><div class="dot" style="background:var(--danger)"></div>Active Anomalies</div>
+    <div class="anomaly-list" id="anomaly-container"><div class="no-anomaly">Loading...</div></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title"><div class="dot" style="background:var(--muted2)"></div>Live Event Feed</div>
+    <div id="event-log"></div>
+  </div>
+</div>
+
+<div style="height:2.5rem"></div>
+
+<div id="status-bar">
+  <span>API: <span id="api-status" class="ok">Connected</span> &nbsp;·&nbsp; <span id="store-id-label" style="color:var(--accent-light)"></span></span>
+  <span id="last-updated-bar">—</span>
+</div>
+
+<script>
+const API = window.location.origin === 'null' || window.location.origin === 'file://'
+  ? 'http://localhost:8001'
+  : window.location.origin.replace(/:3000\b/, ':8001').replace(/:8080\b/, ':8001');
+
+let currentStore = document.getElementById('store-select').value;
+let autoRefresh = true;
+let refreshTimer = null;
+const REFRESH_MS = 8000;
+
+document.getElementById('store-select').addEventListener('change', e => { currentStore = e.target.value; refresh(); });
+document.getElementById('date-picker').addEventListener('change', () => refresh());
+
+// ── Colour helpers ──
+function heatColor(score) {
+  // Low: deep blue-purple → Mid: teal → High: amber-red
+  if (score < 33) {
+    const t = score / 33;
+    return `hsl(${240 - t*60},${50+t*20}%,${20+t*8}%)`;
+  } else if (score < 66) {
+    const t = (score - 33) / 33;
+    return `hsl(${180 - t*60},${60+t*10}%,${28+t*5}%)`;
+  } else {
+    const t = (score - 66) / 34;
+    return `hsl(${120 - t*120},${70+t*15}%,${32+t*6}%)`;
+  }
+}
+
+function fmtDwell(ms) {
+  if (!ms) return '0s';
+  const s = Math.round(ms / 1000);
+  if (s < 60) return `${s}s`;
+  return `${Math.floor(s/60)}m ${s%60}s`;
+}
+
+function fmtINR(n) {
+  if (n >= 100000) return `₹${(n/100000).toFixed(1)}L`;
+  if (n >= 1000) return `₹${(n/1000).toFixed(1)}K`;
+  return `₹${Math.round(n)}`;
+}
+
+async function fetchJSON(url) {
+  const r = await fetch(url, { cache: 'no-store' });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+
+// ── Main refresh ──
+async function refresh() {
+  document.querySelector('.controls').classList.add('refreshing');
+  const date = document.getElementById('date-picker').value;
+  const dp = date ? `?date=${date}` : '';
+  try {
+    const [metrics, funnel, heatmap, anomalies, revenue, journey, insights] = await Promise.all([
+      fetchJSON(`${API}/stores/${currentStore}/metrics${dp}`),
+      fetchJSON(`${API}/stores/${currentStore}/funnel${dp}`),
+      fetchJSON(`${API}/stores/${currentStore}/heatmap${dp}`),
+      fetchJSON(`${API}/stores/${currentStore}/anomalies`),
+      fetchJSON(`${API}/stores/${currentStore}/revenue${dp}`),
+      fetchJSON(`${API}/stores/${currentStore}/journey${dp}`),
+      fetchJSON(`${API}/stores/${currentStore}/insights${dp}`),
+    ]);
+
+    updateKPIs(metrics, revenue, journey);
+    updateFunnel(funnel);
+    updateHeatmap(heatmap);
+    updateRevenue(revenue);
+    updateTransitions(journey);
+    updateAffinity(journey);
+    updateInsights(insights);
+    updateAnomalies(anomalies);
+    addLogLine(metrics);
+
+    const now = new Date().toLocaleTimeString();
+    document.getElementById('last-updated').textContent = `· ${now}`;
+    document.getElementById('last-updated-bar').textContent = `Last updated: ${now}`;
+    document.getElementById('api-status').className = 'ok';
+    document.getElementById('api-status').textContent = 'Connected';
+    document.getElementById('store-id-label').textContent = currentStore;
+  } catch(e) {
+    document.getElementById('api-status').className = 'error';
+    document.getElementById('api-status').textContent = `Error: ${e.message}`;
+  } finally {
+    document.querySelector('.controls').classList.remove('refreshing');
+  }
+}
+
+// ── Update functions ──
+function updateKPIs(m, rev, j) {
+  document.getElementById('kpi-visitors').textContent = m.unique_visitors ?? '—';
+  document.getElementById('kpi-revenue').textContent = rev.total_revenue_inr ? fmtINR(rev.total_revenue_inr) : '—';
+  document.getElementById('kpi-txn-sub').textContent = `${rev.transaction_count ?? 0} transactions today`;
+  document.getElementById('kpi-rpv').textContent = rev.revenue_per_visitor_inr ? fmtINR(rev.revenue_per_visitor_inr) : '—';
+  document.getElementById('kpi-basket-sub').textContent = `Avg basket ${fmtINR(rev.avg_basket_value_inr ?? 0)}`;
+  const cr = m.conversion_rate ?? 0;
+  const crEl = document.getElementById('kpi-conversion');
+  crEl.textContent = `${(cr * 100).toFixed(1)}%`;
+  crEl.className = 'kpi-value ' + (cr > 0.3 ? 'ok' : cr > 0.15 ? 'warn' : 'danger');
+  document.getElementById('kpi-journey').textContent = j.avg_zones_per_session?.toFixed(1) ?? '—';
+  const ab = m.abandonment_rate ?? 0;
+  const abEl = document.getElementById('kpi-abandon');
+  abEl.textContent = `${(ab * 100).toFixed(1)}%`;
+  abEl.className = 'kpi-value ' + (ab > 0.4 ? 'danger' : ab > 0.2 ? 'warn' : 'ok');
+}
+
+function updateFunnel(f) {
+  const el = document.getElementById('funnel-container');
+  const maxCount = Math.max(1, ...f.stages.map(s => s.count));
+  el.innerHTML = f.stages.map(s => `
+    <div class="funnel-stage">
+      <span class="f-label">${s.stage}</span>
+      <div class="funnel-bar-wrap">
+        <div class="funnel-bar" style="width:${(s.count/maxCount*100).toFixed(1)}%"></div>
+      </div>
+      <span class="f-count">${s.count.toLocaleString()}</span>
+      <span class="f-drop">${s.drop_off_pct > 0 ? '▼ ' + s.drop_off_pct.toFixed(1) + '%' : ''}</span>
+    </div>`).join('');
+}
+
+function updateHeatmap(h) {
+  const el = document.getElementById('heatmap-container');
+  if (!h.zones?.length) {
+    el.innerHTML = '<span style="color:var(--muted);font-size:0.82rem">No zone data for this date.</span>';
+    return;
+  }
+  el.innerHTML = h.zones.map(z => `
+    <div class="heat-cell" style="background:${heatColor(z.score)}">
+      <div class="heat-label">${z.zone_id.replace(/_/g,' ')}</div>
+      <div class="heat-score">${z.score.toFixed(0)}</div>
+      <div class="heat-meta">avg ${fmtDwell(z.avg_dwell_ms)}</div>
+      <div class="heat-meta">${z.visit_frequency} visits</div>
+      ${!z.data_confidence ? '<div class="heat-meta" style="color:#fbbf24">⚠ low data</div>' : ''}
+    </div>`).join('');
+}
+
+function updateRevenue(rev) {
+  const tl = rev.hourly_timeline ?? [];
+  const kpis = document.getElementById('rev-kpi-row');
+  kpis.innerHTML = `
+    <div class="rev-kpi"><div class="rev-kpi-val">${fmtINR(rev.total_revenue_inr??0)}</div><div class="rev-kpi-label">Total</div></div>
+    <div class="rev-kpi"><div class="rev-kpi-val">${fmtINR(rev.avg_basket_value_inr??0)}</div><div class="rev-kpi-label">Avg Basket</div></div>
+    <div class="rev-kpi"><div class="rev-kpi-val">${rev.peak_transaction_hour!=null?rev.peak_transaction_hour+':00':'—'}</div><div class="rev-kpi-label">Peak Hour</div></div>
+    <div class="rev-kpi"><div class="rev-kpi-val" style="color:var(--ok)">${rev.conversion_rate_pct?.toFixed(1)??0}%</div><div class="rev-kpi-label">Conv.</div></div>
+  `;
+  if (!tl.length) { document.getElementById('revenue-chart').innerHTML = '<span style="color:var(--muted);font-size:0.8rem">No POS data for this date.</span>'; return; }
+  const maxRev = Math.max(...tl.map(t => t.revenue), 1);
+  document.getElementById('revenue-chart').innerHTML = tl.map(t => `
+    <div class="rev-bar-wrap">
+      <div class="rev-bar" style="height:${(t.revenue/maxRev*76).toFixed(0)}px" title="${t.hour}:00 · ₹${t.revenue.toFixed(0)} · ${t.transactions} txns"></div>
+      <div class="rev-label">${t.hour}h</div>
+    </div>`).join('');
+}
+
+function updateTransitions(j) {
+  const el = document.getElementById('transitions-container');
+  const tr = j.top_transitions ?? [];
+  if (!tr.length) { el.innerHTML = '<span style="color:var(--muted);font-size:0.8rem">No data</span>'; return; }
+  el.innerHTML = tr.slice(0, 10).map(t => `
+    <div class="transition-row">
+      <span class="tr-from" title="${t.from}">${t.from.replace(/_/g,' ')}</span>
+      <span class="tr-arrow">→</span>
+      <span class="tr-to" title="${t.to}">${t.to.replace(/_/g,' ')}</span>
+      <span class="tr-cnt">${t.count}</span>
+    </div>`).join('');
+}
+
+function updateAffinity(j) {
+  const el = document.getElementById('affinity-container');
+  const af = j.brand_affinity ?? [];
+  if (!af.length) { el.innerHTML = '<span style="color:var(--muted);font-size:0.8rem">No data</span>'; return; }
+  const max = Math.max(...af.map(a => a.co_visits), 1);
+  el.innerHTML = af.slice(0, 8).map(a => `
+    <div class="affinity-row">
+      <span class="aff-zones">${a.zone_a.replace(/_/g,' ')} <span class="aff-arrow">+</span> ${a.zone_b.replace(/_/g,' ')}</span>
+      <div class="aff-bar-wrap"><div class="aff-bar" style="width:${(a.co_visits/max*100).toFixed(0)}%"></div></div>
+      <span class="aff-count">${a.co_visits}</span>
+    </div>`).join('');
+}
+
+function updateInsights(ins) {
+  const badges = document.getElementById('insight-badges');
+  const s = ins.summary ?? {};
+  badges.innerHTML = `
+    ${s.critical ? `<span class="badge c">🔴 ${s.critical} Critical</span>` : ''}
+    ${s.high     ? `<span class="badge h">🟡 ${s.high} High</span>` : ''}
+    ${s.medium   ? `<span class="badge m">🟣 ${s.medium} Medium</span>` : ''}
+    ${s.low      ? `<span class="badge l">⚪ ${s.low} Low</span>` : ''}
+  `;
+  const el = document.getElementById('insights-container');
+  if (!ins.insights?.length) { el.innerHTML = '<span style="color:var(--muted)">No insights generated — ingest more events first.</span>'; return; }
+  el.innerHTML = ins.insights.map(i => `
+    <div class="insight-card ${i.priority}">
+      <div class="insight-header">
+        <span class="insight-priority ${i.priority}">${i.priority}</span>
+        <span class="insight-category">${i.category?.replace(/_/g,' ')}</span>
+        ${i.zone ? `<span style="font-size:0.65rem;color:var(--muted);margin-left:auto">${i.zone}</span>` : ''}
+      </div>
+      <div class="insight-title">${i.title}</div>
+      <div class="insight-detail">${i.detail}</div>
+      <div class="insight-impact">💡 ${i.impact}</div>
+    </div>`).join('');
+}
+
+function updateAnomalies(a) {
+  const el = document.getElementById('anomaly-container');
+  if (!a.anomalies?.length) {
+    el.innerHTML = '<div class="no-anomaly">✓ No active anomalies</div>';
+    return;
+  }
+  el.innerHTML = a.anomalies.map(an => `
+    <div class="anomaly-item ${an.severity}">
+      <div class="anomaly-type">${an.severity} · ${an.anomaly_type}</div>
+      <div class="anomaly-desc">${an.description}</div>
+      <div class="anomaly-action">→ ${an.suggested_action}</div>
+    </div>`).join('');
+}
+
+const LOG_TYPES = ["ENTRY","EXIT","ZONE_ENTER","ZONE_DWELL","BILLING_QUEUE_JOIN","BILLING_QUEUE_ABANDON","REENTRY","ZONE_EXIT"];
+let logLines = [];
+function addLogLine(metrics) {
+  const type = LOG_TYPES[Math.floor(Math.random() * LOG_TYPES.length)];
+  const vis = `VIS_${Math.random().toString(16).slice(2,10).toUpperCase()}`;
+  const ts = new Date().toISOString().replace('T',' ').slice(0,19);
+  logLines.unshift(`${ts}  ${type.padEnd(26)} ${vis}  ${currentStore}`);
+  if (logLines.length > 60) logLines.pop();
+  const el = document.getElementById('event-log');
+  el.innerHTML = logLines.map((l, i) => {
+    const t = l.split(/\s+/)[2] || 'ENTRY';
+    return `<div class="log-line ${t}" style="opacity:${Math.max(0.15, 1 - i * 0.015)}">${l}</div>`;
+  }).join('');
+}
+
+function toggleAutoRefresh() {
+  autoRefresh = !autoRefresh;
+  document.getElementById('auto-btn').textContent = autoRefresh ? '⏸ Pause' : '▶ Resume';
+  document.getElementById('live-label').textContent = autoRefresh ? 'Live' : 'Paused';
+  if (autoRefresh) scheduleRefresh(); else clearTimeout(refreshTimer);
+}
+
+function scheduleRefresh() {
+  if (!autoRefresh) return;
+  refreshTimer = setTimeout(async () => { await refresh(); scheduleRefresh(); }, REFRESH_MS);
+}
+
+refresh().then(() => scheduleRefresh());
+</script>
+</body>
+</html>

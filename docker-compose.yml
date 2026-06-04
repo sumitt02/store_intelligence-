@@ -1,0 +1,61 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - db_data:/data
+    environment:
+      - DB_PATH=/data/store_intelligence.db
+      - POS_PATH=/data/pos_transactions.csv
+      - LOG_LEVEL=INFO
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+  # Optional: run the simulator to pre-populate events on startup
+  seed:
+    build: .
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - db_data:/data
+      - ./pipeline:/pipeline
+      - ./data:/data
+    working_dir: /pipeline
+    command: >
+      sh -c "
+        pip install -q requests &&
+        python simulator.py /data/events.jsonl &&
+        python - <<'EOF'
+import json, requests, os
+api = 'http://api:8000'
+with open('/data/events.jsonl') as f:
+    events = [json.loads(l) for l in f if l.strip()]
+for i in range(0, len(events), 500):
+    r = requests.post(f'{api}/events/ingest', json=events[i:i+500], timeout=30)
+    print(f'Batch {i//500+1}: {r.json()}')
+print('Seed complete')
+EOF
+      "
+    restart: "no"
+
+  dashboard:
+    image: nginx:alpine
+    ports:
+      - "3000:80"
+    volumes:
+      - ./dashboard:/usr/share/nginx/html:ro
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  db_data:
